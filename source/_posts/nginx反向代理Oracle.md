@@ -58,12 +58,16 @@ stream {
      }
  
      server {
-         listen 10521 so_keepalive=on;
-         proxy_connect_timeout 50s;#连接事件增加
-         #proxy_timeout 24h; #不设置timeout事件
-         proxy_pass wxdoracle;
-         tcp_nodelay on;
-         proxy_buffer_size 1024k;
+        # keepalive的可配置参数差不多有以下几个：keepidle，keepintvl，keepcnt
+        # keepidle为连接保持时间；keepintvl为连接的间隔时间；keepcnt是连接的个数
+        # 下示将idle超时设置为30分钟，探测间隔为系统默认值，并将探测计数设置为10个探测器
+        # 实际配置的格式为：so_keepalive=on|off|[keepidle]:[keepintvl]:[keepcnt]
+        listen 10521 so_keepalive=on;
+        proxy_connect_timeout 50s;#连接事件增加
+        #proxy_timeout 24h; #不设置timeout事件
+        proxy_pass wxdoracle;
+        tcp_nodelay on;
+        proxy_buffer_size 1024k;
      }
 }
 ```
