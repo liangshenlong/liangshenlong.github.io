@@ -92,3 +92,5 @@ deploy:
   type: git
   repository: https://github.com/liangshenlong/liangshenlong.github.io.git
   branch: master
+  name: liangshenlong
+  email: liangshenlong@foxmail.com
