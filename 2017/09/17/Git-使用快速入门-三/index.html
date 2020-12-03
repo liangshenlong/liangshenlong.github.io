@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Git," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/L.png?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="创建初始版本库首先从一个空的文件下创建版本库。123$ cd public$ echo &apos;init git repository&apos; &amp;gt; text$ git init git init会创建一个名为.git的隐藏目录。 将文件添加到版本库git init创建新的Git版本库，最初Git版本库是空的。需要使用git add命令添加文件到版本库中。  git add . 把当前目录及子目录中文件添">
+<meta name="keywords" content="Git">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Git-使用快速入门(三)">
+<meta property="og:url" content="https://liangshenlong.github.io/2017/09/17/Git-使用快速入门-三/index.html">
+<meta property="og:site_name" content="Liang&#39;s Notes">
+<meta property="og:description" content="创建初始版本库首先从一个空的文件下创建版本库。123$ cd public$ echo &apos;init git repository&apos; &amp;gt; text$ git init git init会创建一个名为.git的隐藏目录。 将文件添加到版本库git init创建新的Git版本库，最初Git版本库是空的。需要使用git add命令添加文件到版本库中。  git add . 把当前目录及子目录中文件添">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-10-20T06:08:29.854Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Git-使用快速入门(三)">
+<meta name="twitter:description" content="创建初始版本库首先从一个空的文件下创建版本库。123$ cd public$ echo &apos;init git repository&apos; &amp;gt; text$ git init git init会创建一个名为.git的隐藏目录。 将文件添加到版本库git init创建新的Git版本库，最初Git版本库是空的。需要使用git add命令添加文件到版本库中。  git add . 把当前目录及子目录中文件添">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.2',
+    sidebar: {"position":"left","display":"hide","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://liangshenlong.github.io/2017/09/17/Git-使用快速入门-三/"/>
+
+
+
+
+
+  <title>Git-使用快速入门(三) | Liang's Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Liang's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">It's sink or swim</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://liangshenlong.github.io/2017/09/17/Git-使用快速入门-三/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="liangshenlong">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/locky.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Liang's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Git-使用快速入门(三)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-17T21:27:47+08:00">
+                2017-09-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Git/" itemprop="url" rel="index">
+                    <span itemprop="name">Git</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/09/17/Git-使用快速入门-三/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/09/17/Git-使用快速入门-三/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="创建初始版本库"><a href="#创建初始版本库" class="headerlink" title="创建初始版本库"></a>创建初始版本库</h1><p>首先从一个空的文件下创建版本库。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> public</span><br><span class="line">$ <span class="built_in">echo</span> <span class="string">'init git repository'</span> &gt; text</span><br><span class="line">$ git init</span><br></pre></td></tr></table></figure></p>
+<p>git init会创建一个名为.git的隐藏目录。</p>
+<h1 id="将文件添加到版本库"><a href="#将文件添加到版本库" class="headerlink" title="将文件添加到版本库"></a>将文件添加到版本库</h1><p>git init创建新的Git版本库，最初Git版本库是空的。需要使用git add命令添加文件到版本库中。</p>
+<blockquote>
+<p>git add . 把当前目录及子目录中文件添加到版本库中</p>
+</blockquote>
+<p>在执行add前，运行git status命令查看版本库状态<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$ git status</span><br><span class="line">On branch master</span><br><span class="line"></span><br><span class="line">Initial commit</span><br><span class="line"></span><br><span class="line">Untracked files:</span><br><span class="line">  (use <span class="string">"git add &lt;file&gt;..."</span> to include <span class="keyword">in</span> what will be committed)</span><br><span class="line"></span><br><span class="line">        text</span><br><span class="line"></span><br><span class="line">nothing added to commit but untracked files present (use <span class="string">"git add"</span> to track)</span><br></pre></td></tr></table></figure></p>
+<p>此时text文件还是未追踪的状态，执行git add命令之后，Git会在索引中暂存（staged）这个文件。<br><a id="more"></a><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">$ git add text</span><br><span class="line"></span><br><span class="line"><span class="comment">#再次执行git status</span></span><br><span class="line">$ git status</span><br><span class="line">On branch master</span><br><span class="line"></span><br><span class="line">Initial commit</span><br><span class="line"></span><br><span class="line">Changes to be committed:</span><br><span class="line">  (use <span class="string">"git rm --cached &lt;file&gt;..."</span> to unstage)</span><br><span class="line"></span><br><span class="line">        new file:   text</span><br></pre></td></tr></table></figure></p>
+<p>接下来执行git commit可提交text到版本库。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git commit -m <span class="string">"add text"</span></span><br><span class="line">[master (root-commit) 5147532] add text</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>git commit时Git需要知道你的名字和email</p>
+</blockquote>
+<blockquote>
+<p>可以使用git config命令在配置文件中保存</p>
+</blockquote>
+<blockquote>
+<p>git config user.name “name”</p>
+</blockquote>
+<blockquote>
+<p>git config user.email “email”</p>
+</blockquote>
+<p>修改text文件后，因为text文件已经存在版本库中。因此可以直接执行commit命令提交文件。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git commit text -m <span class="string">"修改"</span></span><br><span class="line">The file will have its original line endings <span class="keyword">in</span> your working directory.</span><br><span class="line"> 1 file changed, 1 insertion(+), 1 deletion(-)</span><br></pre></td></tr></table></figure></p>
+<h1 id="查看提交"><a href="#查看提交" class="headerlink" title="查看提交"></a>查看提交</h1><p>git log可以查看提交记录。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">$ git <span class="built_in">log</span></span><br><span class="line">commit 3c4fc9aea919825b51a43a10e4cabe67aac9b0b7</span><br><span class="line">Author: liangshenlong &lt;youremail@host,com&gt;</span><br><span class="line">Date:   Sun Sep 17 22:32:41 2017 +0800</span><br><span class="line"></span><br><span class="line">    修改</span><br><span class="line"></span><br><span class="line">commit 5147532990a37fdde5268063358ff74c37156fc7</span><br><span class="line">Author: liangshenlong &lt;youremail@host,com&gt;</span><br><span class="line">Date:   Sun Sep 17 22:27:12 2017 +0800</span><br><span class="line"></span><br><span class="line">    add text</span><br></pre></td></tr></table></figure></p>
+<p>查看指定提交的详细信息，可以使用git show命令<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">$ git show 3c4fc9aea91</span><br><span class="line">commit 3c4fc9aea919825b51a43a10e4cabe67aac9b0b7</span><br><span class="line">Author: liangshenlong &lt;youremail@host,com&gt;</span><br><span class="line">Date:   Sun Sep 17 22:32:41 2017 +0800</span><br><span class="line"></span><br><span class="line">    修改</span><br><span class="line"></span><br><span class="line">diff --git a/text b/text</span><br><span class="line">index be23fc5..a82746d 100644</span><br><span class="line">--- a/text</span><br><span class="line">+++ b/text</span><br><span class="line">@@ -1 +1 @@</span><br><span class="line">-init git repository</span><br><span class="line">+ttt</span><br></pre></td></tr></table></figure></p>
+<p>另一种方式是使用show-branch，提供当前分支间接的单行摘要。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git show-branch --more=5</span><br><span class="line">[master] 修改</span><br><span class="line">[master^] add text</span><br></pre></td></tr></table></figure></p>
+<p>参数”–more=5”表示5个提交，因为只有2个提交，因此只显示两行。</p>
+<h1 id="查看提交差异"><a href="#查看提交差异" class="headerlink" title="查看提交差异"></a>查看提交差异</h1><p>git diff可以查看两个提交之间的差异，因为两次提交都只是修改text，因此比较这两个提交就可以查看text的差异。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ git diff 51475 3c4fc</span><br><span class="line">diff --git a/text b/text</span><br><span class="line">index be23fc5..a82746d 100644</span><br><span class="line">--- a/text</span><br><span class="line">+++ b/text</span><br><span class="line">@@ -1 +1 @@</span><br><span class="line">-init git repository</span><br><span class="line">+ttt</span><br></pre></td></tr></table></figure></p>
+<h1 id="版本库内文件的删除和重命名"><a href="#版本库内文件的删除和重命名" class="headerlink" title="版本库内文件的删除和重命名"></a>版本库内文件的删除和重命名</h1><p>在版本库中删除文件与添加文件类似。git rm命令可以文件。</p>
+<p>例如删除版本库中的text1文件<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">$ git rm text1</span><br><span class="line">rm <span class="string">'text1'</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#执行git status查看状态</span></span><br><span class="line">$ git status</span><br><span class="line">On branch master</span><br><span class="line">Changes to be committed:</span><br><span class="line">  (use <span class="string">"git reset HEAD &lt;file&gt;..."</span> to unstage)</span><br><span class="line"></span><br><span class="line">        deleted:    text1</span><br><span class="line"></span><br><span class="line"><span class="comment">#执行commit提交变更</span></span><br><span class="line">$ git commit -m <span class="string">"删除text1"</span></span><br><span class="line">[master f4db54e] 删除text1</span><br><span class="line">1 file changed, 1 deletion(-)</span><br><span class="line">delete mode 100644 text1</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>git rm –cached 文件名 可删除索引中文件</p>
+</blockquote>
+<p>git mv命令可以重命名文件，操作与rm类似。</p>
+<h1 id="创建版本库副本"><a href="#创建版本库副本" class="headerlink" title="创建版本库副本"></a>创建版本库副本</h1><p>git clone命令可以创建版本库副本<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#本地克隆</span></span><br><span class="line">$ git <span class="built_in">clone</span> public public_clone</span><br><span class="line"><span class="comment">#克隆远程库</span></span><br><span class="line">$ git <span class="built_in">clone</span> url localdir/localname</span><br></pre></td></tr></table></figure></p>
+<h1 id="配置文件"><a href="#配置文件" class="headerlink" title="配置文件"></a>配置文件</h1><p>Git支持不同层次的配置文件。按照优先级递减的顺序，如下：</p>
+<blockquote>
+<p>.git/config</p>
+</blockquote>
+<blockquote>
+<p>版本库特定的配置设置，可用–file选项修改，是默认选项。这些设置是最高优先级的。</p>
+</blockquote>
+<blockquote>
+<p>~/.gitconfig</p>
+</blockquote>
+<blockquote>
+<p>用户特定的配置设置，可用–global选项修改。</p>
+</blockquote>
+<blockquote>
+<p>/etc/gitconfig</p>
+</blockquote>
+<blockquote>
+<p>系统范围的设置配置。根据实际安装情况，这个系统设置文件可能在替他位置。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#建立username用于所有版本库</span></span><br><span class="line">$ git config --global user.name <span class="string">"name"</span></span><br><span class="line"><span class="comment">#建立username用于特定版本库</span></span><br><span class="line">$ git config user.name <span class="string">"name"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#查看配置</span></span><br><span class="line">$ git config -l</span><br><span class="line">core.symlinks=<span class="literal">false</span></span><br><span class="line">core.autocrlf=<span class="literal">true</span></span><br><span class="line">color.diff=auto</span><br><span class="line">color.status=auto</span><br><span class="line">color.branch=auto</span><br><span class="line">color.interactive=<span class="literal">true</span></span><br><span class="line">help.format=html</span><br><span class="line">http.sslcainfo=D:/Git/mingw64/ssl/certs/ca-bundle.crt</span><br><span class="line">diff.astextplain.textconv=astextplain</span><br><span class="line">rebase.autosquash=<span class="literal">true</span></span><br><span class="line">credential.helper=manager</span><br><span class="line">user.name=liangshenlong</span><br><span class="line">user.email=314267619@qq,com</span><br><span class="line">core.repositoryformatversion=0</span><br><span class="line">core.filemode=<span class="literal">false</span></span><br><span class="line">core.bare=<span class="literal">false</span></span><br><span class="line">core.logallrefupdates=<span class="literal">true</span></span><br><span class="line">core.symlinks=<span class="literal">false</span></span><br><span class="line">core.ignorecase=<span class="literal">true</span></span><br><span class="line">core.hidedotfiles=dotGitOnly</span><br></pre></td></tr></table></figure>
+<p>也可以直接打开config文件查看，修改文件<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">$ cat .git/config</span><br><span class="line">[core]</span><br><span class="line">        repositoryformatversion = 0</span><br><span class="line">        filemode = <span class="literal">false</span></span><br><span class="line">        bare = <span class="literal">false</span></span><br><span class="line">        logallrefupdates = <span class="literal">true</span></span><br><span class="line">        symlinks = <span class="literal">false</span></span><br><span class="line">        ignorecase = <span class="literal">true</span></span><br><span class="line">        hideDotFiles = dotGitOnly</span><br><span class="line">[user]</span><br><span class="line">        name = liangshenlong</span><br><span class="line">        email = email@host.com</span><br></pre></td></tr></table></figure></p>
+<p>直接修改config文件也可以添加，修改配置信息。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Git/" rel="tag"># Git</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/17/Git-基本概念-二/" rel="next" title="Git-基本概念(二)">
+                <i class="fa fa-chevron-left"></i> Git-基本概念(二)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/17/Git-远程版本库-四/" rel="prev" title="Git-远程版本库(四)">
+                Git-远程版本库(四) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          
+            <img class="site-author-image" itemprop="image"
+              src="/images/locky.jpg"
+              alt="liangshenlong" />
+          
+            <p class="site-author-name" itemprop="name">liangshenlong</p>
+            <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+            
+              <a href="/archives/">
+            
+                <span class="site-state-item-count">12</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/liangshenlong" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>GitHub</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#创建初始版本库"><span class="nav-number">1.</span> <span class="nav-text">创建初始版本库</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#将文件添加到版本库"><span class="nav-number">2.</span> <span class="nav-text">将文件添加到版本库</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#查看提交"><span class="nav-number">3.</span> <span class="nav-text">查看提交</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#查看提交差异"><span class="nav-number">4.</span> <span class="nav-text">查看提交差异</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#版本库内文件的删除和重命名"><span class="nav-number">5.</span> <span class="nav-text">版本库内文件的删除和重命名</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#创建版本库副本"><span class="nav-number">6.</span> <span class="nav-text">创建版本库副本</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#配置文件"><span class="nav-number">7.</span> <span class="nav-text">配置文件</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">liangshenlong</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+  <span class="post-meta-divider">|</span>
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.2</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://liangshenlong.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://liangshenlong.github.io/2017/09/17/Git-使用快速入门-三/';
+          this.page.identifier = '2017/09/17/Git-使用快速入门-三/';
+          this.page.title = 'Git-使用快速入门(三)';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://liangshenlong.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

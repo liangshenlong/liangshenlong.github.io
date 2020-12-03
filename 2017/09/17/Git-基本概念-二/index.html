@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Git," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/L.png?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="基本概念版本库Git版本库（repository）只是一个简单的数据库，其中包含所有用来维护与管理项目的修订版本和历史信息。跟大多数VCS一样，一个版本库维护项目的整个生命周期的完整副本。不同的是Git版本库不仅提供版本库所有文件的完整副本，还提供版本库本身的副本。 在版本库中，Git维护两个主要的数据结构：对象库（Object store）和索引（index）。所有这些版本库数据存在在工作目录根">
+<meta name="keywords" content="Git">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Git-基本概念(二)">
+<meta property="og:url" content="https://liangshenlong.github.io/2017/09/17/Git-基本概念-二/index.html">
+<meta property="og:site_name" content="Liang&#39;s Notes">
+<meta property="og:description" content="基本概念版本库Git版本库（repository）只是一个简单的数据库，其中包含所有用来维护与管理项目的修订版本和历史信息。跟大多数VCS一样，一个版本库维护项目的整个生命周期的完整副本。不同的是Git版本库不仅提供版本库所有文件的完整副本，还提供版本库本身的副本。 在版本库中，Git维护两个主要的数据结构：对象库（Object store）和索引（index）。所有这些版本库数据存在在工作目录根">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://liangshenlong.github.io/images/git对象图.png">
+<meta property="og:image" content="https://liangshenlong.github.io/images/gitlog.png">
+<meta property="og:image" content="https://liangshenlong.github.io/images/rebase_before.png">
+<meta property="og:image" content="https://liangshenlong.github.io/images/rebase_after.png">
+<meta property="og:updated_time" content="2020-10-20T06:08:29.855Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Git-基本概念(二)">
+<meta name="twitter:description" content="基本概念版本库Git版本库（repository）只是一个简单的数据库，其中包含所有用来维护与管理项目的修订版本和历史信息。跟大多数VCS一样，一个版本库维护项目的整个生命周期的完整副本。不同的是Git版本库不仅提供版本库所有文件的完整副本，还提供版本库本身的副本。 在版本库中，Git维护两个主要的数据结构：对象库（Object store）和索引（index）。所有这些版本库数据存在在工作目录根">
+<meta name="twitter:image" content="https://liangshenlong.github.io/images/git对象图.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.2',
+    sidebar: {"position":"left","display":"hide","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://liangshenlong.github.io/2017/09/17/Git-基本概念-二/"/>
+
+
+
+
+
+  <title>Git-基本概念(二) | Liang's Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Liang's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">It's sink or swim</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://liangshenlong.github.io/2017/09/17/Git-基本概念-二/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="liangshenlong">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/locky.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Liang's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Git-基本概念(二)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-17T10:19:22+08:00">
+                2017-09-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Git/" itemprop="url" rel="index">
+                    <span itemprop="name">Git</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/09/17/Git-基本概念-二/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/09/17/Git-基本概念-二/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h1><h2 id="版本库"><a href="#版本库" class="headerlink" title="版本库"></a>版本库</h2><p>Git版本库（repository）只是一个简单的数据库，其中包含所有用来维护与管理项目的修订版本和历史信息。跟大多数VCS一样，一个版本库维护项目的整个生命周期的完整副本。不同的是Git版本库不仅提供版本库所有文件的完整副本，还提供版本库本身的副本。</p>
+<p>在版本库中，Git维护两个主要的数据结构：对象库（Object store）和索引（index）。所有这些版本库数据存在在工作目录根目录下.git隐藏文件夹中。<br><a id="more"></a></p>
+<h2 id="Git对象类型"><a href="#Git对象类型" class="headerlink" title="Git对象类型"></a>Git对象类型</h2><p>对象库是Git版本库实现的基础。它包含原始数据文件和所有日志信息、作者信息、日期，以及其他用来重建项目任意版本或分支的信息。</p>
+<p>Git放在对象库中的对象只有4种类型：块（blob）、目录树（tree）、提交（commit）和标签（tag）</p>
+<blockquote>
+<p>块（blob）</p>
+</blockquote>
+<blockquote>
+<p>文件的每一个版本表示为一个块（blob）。blob是“二进制大对象”（binary large object）的缩写，用来指代某些可以包含任意数据的变量或文件，同时其内部结构会被程序忽略。一个blob保存一个文件的数据，但不包含任何关于这个文件的元数据，甚至连文件名也没有</p>
+</blockquote>
+<blockquote>
+<p>目录树（tree）</p>
+</blockquote>
+<blockquote>
+<p>一个目录树对象代表一层目录信息。它标记blob标识符、路径名和在一个目录里所有文件的一些元数据。它也可以递归引用其他目录树或子树对象，从而建立一个包含文件和子目录的完整层次结构</p>
+</blockquote>
+<blockquote>
+<p>提交（commit）</p>
+</blockquote>
+<blockquote>
+<p>一个提交对象保存版本库中每一次变化的元数据，包括作者、提交者、提交日期和日志信息。每一个提交对象指向一个目录树对象，这个目录树对象在一张完整的快照中捕获提交时版本库的状态。大多数提交都有父提交，一些提交可能有多个父提交。最初的提交或者跟提交（root commit）是没有父提交的。</p>
+</blockquote>
+<blockquote>
+<p>标签（tag）</p>
+</blockquote>
+<blockquote>
+<p>一个标签对象分配一个任意的且人类可读的名字给一个特定对象，通常是一个提交对象。</p>
+</blockquote>
+<p>随着时间的推移，所有信息在对象库中会变化和增长，项目的编辑、添加和删除都会被跟踪和建模。为了有效的利用磁盘空间和网络宽带，Git把对象压缩现在打包文件（pack file）中，这些文件也在对象库中。</p>
+<h2 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h2><p>索引是一个临时的、动态的二进制文件，它描述整个版本库的目录结构。更具体的说，索引捕获项目在某个时刻的整体结构的一个版本（最后一次提交和下次提交之间的时刻）。<br>开发人员执行Git命令在索引中暂存（stage）变更。变更通常是添加、修改或删除某些文件。索引为记录和保存这些变更，直到提交这些变更。</p>
+<p>当然也可以删除或替换索引中的变更</p>
+<h2 id="可寻址内容名称"><a href="#可寻址内容名称" class="headerlink" title="可寻址内容名称"></a>可寻址内容名称</h2><p>Git对象库被组织及实现成一个内容寻址的存储系统。对象库中的每个对象都有一个唯一名称，这个名称是向对象的内容应用SHA1得到的SHA1散列值。文件的任何变化都会导致SHA1值变化。</p>
+<p>SHA1的值是一个160位的数，通常表示为一个40位的十六进制数。</p>
+<blockquote>
+<p>5159c4c8529657ecea8b26f265dbec9156fb830</p>
+</blockquote>
+<h2 id="Git追踪内容"><a href="#Git追踪内容" class="headerlink" title="Git追踪内容"></a>Git追踪内容</h2><p>Git的内容追踪表现为两种关键的方式</p>
+<p>1.Git对象库基于对象内容计算SHA1值，因此两个文件即使路径不同在Git库中也只会保存一份blob对象。</p>
+<p>2.当文件从一个版本到另一个版本的时候，Git内存数据库会有效的存储每个文件的每个版本，而不是它们的差异。</p>
+<h1 id="对象库图示"><a href="#对象库图示" class="headerlink" title="对象库图示"></a>对象库图示</h1><p><img src="/images/git对象图.png" alt="git对象图"></p>
+<h1 id="文件管理"><a href="#文件管理" class="headerlink" title="文件管理"></a>文件管理</h1><p>Git将所有文件分成3类：已追踪、被忽略的以及未追踪的。</p>
+<blockquote>
+<p>已追踪的（Tracked）</p>
+</blockquote>
+<blockquote>
+<p>已追踪的文件是指已经在版本库中的文件，或者已暂存在索引中的文件。如果想将新文件添加为已追踪文件，执行 git add 文件名</p>
+</blockquote>
+<blockquote>
+<p>被忽略的（Ignored）</p>
+</blockquote>
+<blockquote>
+<p>被忽略的文件必须在版本库中被声明为不可见或被忽略，即使出现在工作目录也不会被追踪。Git通过.gitignore文件管理被忽略文件列表，子目录的.gitignore优先级大于父目录的优先级</p>
+</blockquote>
+<blockquote>
+<p>未追踪的（Untracked）</p>
+</blockquote>
+<blockquote>
+<p>未追踪的文件是指那些不在前两类中的文件。</p>
+</blockquote>
+<h1 id="提交"><a href="#提交" class="headerlink" title="提交"></a>提交</h1><h2 id="绝对提交名"><a href="#绝对提交名" class="headerlink" title="绝对提交名"></a>绝对提交名</h2><p>提交的绝对提交名是它的SHA1值，由于输入一个40位长的SHA1数字过于麻烦，因此Git允许使用唯一的前缀的缩短数字<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git <span class="built_in">log</span> 80d45377b296ee9aace788735a58bf56df17eb8c</span><br><span class="line">$ git <span class="built_in">log</span> 80d45</span><br></pre></td></tr></table></figure></p>
+<h2 id="相对提交名"><a href="#相对提交名" class="headerlink" title="相对提交名"></a>相对提交名</h2><p>除了第一个跟提交之外，每个提交都有比他更早的提交。如果一个提交有多个父提交，那么它必定是合并产生的提交。</p>
+<p>在同一代提交中，^是用来选择不同父提交的。给定一个提交C，C^1是第一个父提交，C^2是第二个父提交，等等</p>
+<p>~用于返回父提交之前并选择上一代提交。给定一个提交C,C~1是它的父提交，C~2是它父提交的父提交。</p>
+<h2 id="提交历史记录"><a href="#提交历史记录" class="headerlink" title="提交历史记录"></a>提交历史记录</h2><p>git log输出提交记录</p>
+<p><img src="/images/gitlog.png" alt="gitlog"></p>
+<p>随着时间推移，git log历史越来越多，可以通过since..until来限制展示提交的范围。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git <span class="built_in">log</span> master~11..master~8</span><br></pre></td></tr></table></figure></p>
+<p>这里，git log显示了master~11到maste~8之间的所有提交，此种方式使用了集合减法运算，提交master~8可达的提交集合减去master~11可达的提交集合。</p>
+<h1 id="引用和符号引用"><a href="#引用和符号引用" class="headerlink" title="引用和符号引用"></a>引用和符号引用</h1><p>引用（ref）是一个SHA1散列值，指向Git对象库中的对象。这个对象通常是提交对象。符号引用（symref）间接指向Git对象。</p>
+<p>本地特性分支名称、远程跟踪分支名称和标签名都是引用。</p>
+<p>每一个符号引用都有一个以ref/开始的明确全程，并且都分层存储在版本库的.git/refs/目录中。目录中基本上有三种不同的命名空间代表不同的引用：refs/heads/ref代表本地分支，refs/remotes/ref代表远程分支，refs/tags/ref代表标签。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ git branch -a</span><br><span class="line">* dev</span><br><span class="line">  master</span><br><span class="line">  remotes/origin/dev</span><br><span class="line">  remotes/origin/master</span><br></pre></td></tr></table></figure>
+<p>Git自动维护几个用于特殊目的的特殊符号引用。这些引用在任何使用提交的地方使用。</p>
+<blockquote>
+<p>HAED</p>
+</blockquote>
+<blockquote>
+<p>HEAD始终指向当前分支的最近提交。</p>
+</blockquote>
+<blockquote>
+<p>ORIG_HEAD</p>
+</blockquote>
+<blockquote>
+<p>某些操作，例如合并（merge）和复位（reset），会把调整为新值之前的先行版本的HEAD记录到ORIG_HEAD中。可以使用ORIG_HEAD来恢复或回滚到之前的状态或者做一个比较。</p>
+</blockquote>
+<blockquote>
+<p>FETCH_HEAD</p>
+</blockquote>
+<blockquote>
+<p>当使用远程库时，git fetch命令将所有抓取分支的头记录到.git/FETCH_HEAD中。FETCH_HEAD是最近抓取的分支HEAD的简写，并且仅在刚刚抓取操作之后才有效。使用这个符号引用，哪怕是一个对没有指定分支名的匿名抓取操作，都可以在git fetch时找到提交的HEAD。</p>
+</blockquote>
+<blockquote>
+<p>MERGE_HEAD</p>
+</blockquote>
+<blockquote>
+<p>当一个合并操作正在进行时，其他分支的头暂时记录在MERGE_HEAD中。换言之，MERGE_HEAD是正在合并进HEAD的提交。</p>
+</blockquote>
+<p>所有符号引用都可以使用底层命令git symbolic-ref进行管理。</p>
+<h1 id="分支"><a href="#分支" class="headerlink" title="分支"></a>分支</h1><p>分支是从一种统一的、原始的状态分离出来的，使得开发能在多个方向上同时进行，并可能产生项目的不同版本。Git的分支系统是轻量级的、简单的。</p>
+<h2 id="创建分支"><a href="#创建分支" class="headerlink" title="创建分支"></a>创建分支</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#创建分支newbranch</span></span><br><span class="line">$ git branch newbranch</span><br><span class="line"><span class="comment">#创建分支newbranch，以oldbranch分支的HEAD作为开始提交</span></span><br><span class="line">$ git branch newbranch oldbranch</span><br><span class="line"><span class="comment">#创建分支newbranch，以指定提交作为开始提交</span></span><br><span class="line">$ git branch newbranch 80d45377b296ee9aace788735a58bf56df17eb8c</span><br></pre></td></tr></table></figure>
+<h2 id="查看分支"><a href="#查看分支" class="headerlink" title="查看分支"></a>查看分支</h2><p>git branch查看本地分支</p>
+<p>git branch -r 查看远程分支</p>
+<p>git branch -a 查看所有分支</p>
+<p>git show-branch命令提供更详细的输出<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ git show-branch</span><br><span class="line">* [dev] 解决右侧菜单图片不显示问题</span><br><span class="line"> ! [master] udpate blog dev</span><br><span class="line">--</span><br><span class="line">*  [dev] 解决右侧菜单图片不显示问题</span><br><span class="line">*  [dev^] 增加文章Git</span><br><span class="line">*  [dev~2] 更新博客</span><br><span class="line">*+ [master] udpate blog dev</span><br></pre></td></tr></table></figure></p>
+<h2 id="检出分支"><a href="#检出分支" class="headerlink" title="检出分支"></a>检出分支</h2><p>使用git checkout命令</p>
+<p>合并检出 git checkout -m dev</p>
+<p>检出创建分支 git checkout -b dev</p>
+<ul>
+<li>git checkout – filename是从索引中检出文件</li>
+</ul>
+<h2 id="删除分支"><a href="#删除分支" class="headerlink" title="删除分支"></a>删除分支</h2><p>命令git branch -d branchname可删除分支</p>
+<p>Git不会让你删除一个包含不存在与当前分支中的提交的分支。<br>可以使用-D覆盖Git的安全检查</p>
+<h1 id="diff"><a href="#diff" class="headerlink" title="diff"></a>diff</h1><p>git diff命令可比较两个不同文件。</p>
+<h2 id="git-diff命令的格式"><a href="#git-diff命令的格式" class="headerlink" title="git diff命令的格式"></a>git diff命令的格式</h2><p>一个根级别的diff可以比较两个版本库的不同。<br>可供树或类树对象使用diff的基本来源：</p>
+<blockquote>
+<p>整个提交图中的任意树对象</p>
+</blockquote>
+<blockquote>
+<p>工作目录</p>
+</blockquote>
+<blockquote>
+<p>索引</p>
+</blockquote>
+<p>git diff命令进行树比较时可以通过提交名、分支名或者标签名。</p>
+<blockquote>
+<p>git diff</p>
+</blockquote>
+<blockquote>
+<p>这个命令显示工作目录和索引之间的差异。</p>
+</blockquote>
+<blockquote>
+<p>git diff commit</p>
+</blockquote>
+<blockquote>
+<p>这个命令会显示工作目录和给定提交之间的差异。</p>
+</blockquote>
+<blockquote>
+<p>git diff –cached commit</p>
+</blockquote>
+<blockquote>
+<p>这个命令会显示索引中和给定提交的差异。如果省略commit，则默认HEAD。</p>
+</blockquote>
+<blockquote>
+<p>git diff commit1 commit2</p>
+</blockquote>
+<blockquote>
+<p>这个命令会显示给定的两个提交之间的差异。</p>
+</blockquote>
+<h2 id="git-diff和提交范围"><a href="#git-diff和提交范围" class="headerlink" title="git diff和提交范围"></a>git diff和提交范围</h2><p>git diff命令支持两点语法来显示两个提交之间的不同。下面两个命令是等价的：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git diff master dev</span><br><span class="line">$ git diff master..dev</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>这里的两点语法和git log的不同</p>
+</blockquote>
+<h2 id="比较svn和git如何产生diff"><a href="#比较svn和git如何产生diff" class="headerlink" title="比较svn和git如何产生diff"></a>比较svn和git如何产生diff</h2><p>SVN会跟踪一系列修订版本，并只存储文件间的差异。所以在比较不同时，svn会将所有的差异合并到工作副本中来产生比较文件。</p>
+<p>Git每次提交都是保存整个文件，因此比较的时候直接操作两个版本的完整文件。</p>
+<h1 id="更改提交"><a href="#更改提交" class="headerlink" title="更改提交"></a>更改提交</h1><p>修改提交会导致提交记录改变，如果提交未推送到远程版本库则没有关系，但是如果提交已经推送到远程版本库，那么就不应该再修改提交。</p>
+<h2 id="使用git-reset"><a href="#使用git-reset" class="headerlink" title="使用git reset"></a>使用git reset</h2><p>git reset命令会把版本库和工作目录改变成已知状态。git reset调整HEAD引用指向给定的提交，默认情况下还会更新索引以匹配该提交。根据需要，git reset命令也可以修改工作目录以呈现给定提交的项目修订版本。</p>
+<p>git reset可以覆盖并销毁工作目录中的修改，可能会导致数据丢失。</p>
+<p>git reset命令有三个重要选项：</p>
+<blockquote>
+<p>git reset –soft commit</p>
+</blockquote>
+<blockquote>
+<p>soft会将HEAD引用指向给定提交。索引和工作目录的内容保持不变。</p>
+</blockquote>
+<blockquote>
+<p>git reset –mixed commit</p>
+</blockquote>
+<blockquote>
+<p>mixed会将HEAD指向给定提交。索引内容也跟着改变以符合给定提交的树结构，但是工作目录中内容保持不变。</p>
+</blockquote>
+<blockquote>
+<p>git reset –hard commit</p>
+</blockquote>
+<blockquote>
+<p>hard会将HEAD引用指向给定提交。索引和工作目录内容都会修改成给定提交的样子。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">选项</th>
+<th style="text-align:left">HEAD</th>
+<th style="text-align:left">索引</th>
+<th style="text-align:left">工作目录</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">–soft</td>
+<td style="text-align:left">是</td>
+<td style="text-align:left">否</td>
+<td style="text-align:left">否</td>
+</tr>
+<tr>
+<td style="text-align:left">–mixed（默认）</td>
+<td style="text-align:left">是</td>
+<td style="text-align:left">是</td>
+<td style="text-align:left">否</td>
+</tr>
+<tr>
+<td style="text-align:left">–hard</td>
+<td style="text-align:left">是</td>
+<td style="text-align:left">是</td>
+<td style="text-align:left">是</td>
+</tr>
+</tbody>
+</table>
+<h2 id="使用git-cherry-pick"><a href="#使用git-cherry-pick" class="headerlink" title="使用git cherry-pick"></a>使用git cherry-pick</h2><p>git cherry-pick提交命令会在当前分支上应用给定提交引入的变更。这将引入一个新的独特提交。严格来说，使用git cherry-pick并不改变版本库中的现有历史记录，而是添加历史记录。</p>
+<p>git cherry-pick命令通常用于把版本库中一个分支的特定提交引入一个不同的分支中，最常见用法是把维护分支的提交移植到开发分支。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#将dev分支上的倒数第三次提交引入当前分支</span></span><br><span class="line">$ git cherry-pick dev~2</span><br></pre></td></tr></table></figure></p>
+<p>在产生新提交的过程中可能需要解决冲突。</p>
+<p>git cherry-pick也允许一次选择并应用一个范围的提交。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git cherry-pick dev~6..dev~2</span><br></pre></td></tr></table></figure></p>
+<h2 id="使用git-revert"><a href="#使用git-revert" class="headerlink" title="使用git revert"></a>使用git revert</h2><p>git revert提交命令跟git cherry-pick命令大致相同，主要区别是：它应用给定提交的逆过程。此命令用于引入一个新提交来抵消给定提交的影响。常见用途是撤销提交历史记录中的某个提交的影响。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#产生一个新的提交，“撤销”dev~2提交产生的影响</span></span><br><span class="line">$ git revert dev~2</span><br></pre></td></tr></table></figure></p>
+<h2 id="变基提交"><a href="#变基提交" class="headerlink" title="变基提交"></a>变基提交</h2><p>git rebase命令是用来改变一串提交以什么为基础的。常见用途是保持你正在开发的一系列提交相对于另一个分支是最新的，那通常是master分支或者是来自另一个版本库的追踪分支。</p>
+<p><img src="/images/rebase_before.png" alt="执行rebase前"><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git checkout dev</span><br><span class="line">$ git rebase master</span><br></pre></td></tr></table></figure></p>
+<p><img src="/images/rebase_after.png" alt="执行rebase后"></p>
+<p>变基操作还有很多其他复杂的应用。</p>
+<h1 id="储藏"><a href="#储藏" class="headerlink" title="储藏"></a>储藏</h1><p>日常的开发工作中，经常因为修复bug、紧急需求、联调等各种突发事件导致开发中断。储藏（stash）可以很好的应对这种问题。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#开发中...</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#接收到高优先级工作</span></span><br><span class="line">$ git stash save</span><br><span class="line"><span class="comment"># git stash save "message"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#处理完高优先级工作</span></span><br><span class="line"></span><br><span class="line">$ git stash pop</span><br><span class="line"><span class="comment">#工作目录恢复save前状态</span></span><br></pre></td></tr></table></figure>
+<p>stash使用栈保存数据，save时数据入栈，pop时出栈（该操作会去除储藏的内容并合并到当前状态）。</p>
+<p>git stash apply可检出储藏栈中内容，又不删除栈中数据。</p>
+<p>git stash drop可以删除储藏栈中内容。</p>
+<p>pop命令相当于apply + drop。</p>
+<p>git stash list按照保存时间由近及远的顺序列举储藏栈中内容。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Git/" rel="tag"># Git</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/16/Git-认识Git-一/" rel="next" title="Git-认识Git(一)">
+                <i class="fa fa-chevron-left"></i> Git-认识Git(一)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/17/Git-使用快速入门-三/" rel="prev" title="Git-使用快速入门(三)">
+                Git-使用快速入门(三) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          
+            <img class="site-author-image" itemprop="image"
+              src="/images/locky.jpg"
+              alt="liangshenlong" />
+          
+            <p class="site-author-name" itemprop="name">liangshenlong</p>
+            <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+            
+              <a href="/archives/">
+            
+                <span class="site-state-item-count">12</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/liangshenlong" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>GitHub</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#基本概念"><span class="nav-number">1.</span> <span class="nav-text">基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#版本库"><span class="nav-number">1.1.</span> <span class="nav-text">版本库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Git对象类型"><span class="nav-number">1.2.</span> <span class="nav-text">Git对象类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#索引"><span class="nav-number">1.3.</span> <span class="nav-text">索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#可寻址内容名称"><span class="nav-number">1.4.</span> <span class="nav-text">可寻址内容名称</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Git追踪内容"><span class="nav-number">1.5.</span> <span class="nav-text">Git追踪内容</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#对象库图示"><span class="nav-number">2.</span> <span class="nav-text">对象库图示</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#文件管理"><span class="nav-number">3.</span> <span class="nav-text">文件管理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#提交"><span class="nav-number">4.</span> <span class="nav-text">提交</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#绝对提交名"><span class="nav-number">4.1.</span> <span class="nav-text">绝对提交名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#相对提交名"><span class="nav-number">4.2.</span> <span class="nav-text">相对提交名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#提交历史记录"><span class="nav-number">4.3.</span> <span class="nav-text">提交历史记录</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#引用和符号引用"><span class="nav-number">5.</span> <span class="nav-text">引用和符号引用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#分支"><span class="nav-number">6.</span> <span class="nav-text">分支</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建分支"><span class="nav-number">6.1.</span> <span class="nav-text">创建分支</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看分支"><span class="nav-number">6.2.</span> <span class="nav-text">查看分支</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#检出分支"><span class="nav-number">6.3.</span> <span class="nav-text">检出分支</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#删除分支"><span class="nav-number">6.4.</span> <span class="nav-text">删除分支</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#diff"><span class="nav-number">7.</span> <span class="nav-text">diff</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#git-diff命令的格式"><span class="nav-number">7.1.</span> <span class="nav-text">git diff命令的格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#git-diff和提交范围"><span class="nav-number">7.2.</span> <span class="nav-text">git diff和提交范围</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#比较svn和git如何产生diff"><span class="nav-number">7.3.</span> <span class="nav-text">比较svn和git如何产生diff</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#更改提交"><span class="nav-number">8.</span> <span class="nav-text">更改提交</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用git-reset"><span class="nav-number">8.1.</span> <span class="nav-text">使用git reset</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用git-cherry-pick"><span class="nav-number">8.2.</span> <span class="nav-text">使用git cherry-pick</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用git-revert"><span class="nav-number">8.3.</span> <span class="nav-text">使用git revert</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#变基提交"><span class="nav-number">8.4.</span> <span class="nav-text">变基提交</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#储藏"><span class="nav-number">9.</span> <span class="nav-text">储藏</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">liangshenlong</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+  <span class="post-meta-divider">|</span>
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.2</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://liangshenlong.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://liangshenlong.github.io/2017/09/17/Git-基本概念-二/';
+          this.page.identifier = '2017/09/17/Git-基本概念-二/';
+          this.page.title = 'Git-基本概念(二)';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://liangshenlong.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

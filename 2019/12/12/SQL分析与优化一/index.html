@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="sql," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/L.png?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="随着业务量的增大，广告系统出现响应慢、挂死。分析日志和代码后初步定位问题在sql。 生成Oracle AWR报告AWR全称Automatic Workload Repository，自动负载信息库，是Oracle 10g版本后推出的一种性能收集和分析工具，提供了一个时间段内整个系统的报表数据。通过AWR报告，可以分析指定的时间段内数据库系统的性能。 可以使用sqlplus登录创建快照1234567">
+<meta name="keywords" content="sql">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SQL分析与优化一">
+<meta property="og:url" content="https://liangshenlong.github.io/2019/12/12/SQL分析与优化一/index.html">
+<meta property="og:site_name" content="Liang&#39;s Notes">
+<meta property="og:description" content="随着业务量的增大，广告系统出现响应慢、挂死。分析日志和代码后初步定位问题在sql。 生成Oracle AWR报告AWR全称Automatic Workload Repository，自动负载信息库，是Oracle 10g版本后推出的一种性能收集和分析工具，提供了一个时间段内整个系统的报表数据。通过AWR报告，可以分析指定的时间段内数据库系统的性能。 可以使用sqlplus登录创建快照1234567">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://liangshenlong.github.io/images/awr-head.jpg">
+<meta property="og:image" content="https://liangshenlong.github.io/images/awr-loadProfile.jpg">
+<meta property="og:image" content="https://liangshenlong.github.io/images/awr-statistics.png">
+<meta property="og:updated_time" content="2020-10-20T06:08:29.858Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SQL分析与优化一">
+<meta name="twitter:description" content="随着业务量的增大，广告系统出现响应慢、挂死。分析日志和代码后初步定位问题在sql。 生成Oracle AWR报告AWR全称Automatic Workload Repository，自动负载信息库，是Oracle 10g版本后推出的一种性能收集和分析工具，提供了一个时间段内整个系统的报表数据。通过AWR报告，可以分析指定的时间段内数据库系统的性能。 可以使用sqlplus登录创建快照1234567">
+<meta name="twitter:image" content="https://liangshenlong.github.io/images/awr-head.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.2',
+    sidebar: {"position":"left","display":"hide","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://liangshenlong.github.io/2019/12/12/SQL分析与优化一/"/>
+
+
+
+
+
+  <title>SQL分析与优化一 | Liang's Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Liang's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">It's sink or swim</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://liangshenlong.github.io/2019/12/12/SQL分析与优化一/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="liangshenlong">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/locky.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Liang's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">SQL分析与优化一</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-12T11:16:42+08:00">
+                2019-12-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Sql/" itemprop="url" rel="index">
+                    <span itemprop="name">Sql</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/12/12/SQL分析与优化一/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2019/12/12/SQL分析与优化一/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>随着业务量的增大，广告系统出现响应慢、挂死。<br>分析日志和代码后初步定位问题在sql。</p>
+<h2 id="生成Oracle-AWR报告"><a href="#生成Oracle-AWR报告" class="headerlink" title="生成Oracle AWR报告"></a>生成Oracle AWR报告</h2><p>AWR全称Automatic Workload Repository，自动负载信息库，是Oracle 10g版本后推出的一种性能收集和分析工具，提供了一个时间段内整个系统的报表数据。通过AWR报告，可以分析指定的时间段内数据库系统的性能。</p>
+<p>可以使用sqlplus登录创建快照<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">#登录oracle服务器，sqlplus登录</span><br><span class="line">[root@dszy-cs-app-ad-check-db1 ec2-user]# su - oracle</span><br><span class="line">[oracle@dszy-cs-app-ad-check-db1 ~]$ cd $ORACLE_HOME</span><br><span class="line">[oracle@dszy-cs-app-ad-check-db1 dbhome_1]$ cd rdbms/admin</span><br><span class="line">[oracle@dszy-cs-app-ad-check-db1 admin]$ sqlplus / as sysdba</span><br><span class="line"></span><br><span class="line">SQL*Plus: Release 11.2.0.4.0 Production on Thu Dec 12 15:56:35 2019</span><br><span class="line"></span><br><span class="line">Copyright (c) 1982, 2013, Oracle.  All rights reserved.</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Connected to:</span><br><span class="line">Oracle Database 11g Enterprise Edition Release 11.2.0.4.0 - 64bit Production</span><br><span class="line">With the Partitioning, OLAP, Data Mining and Real Application Testing options</span><br><span class="line"></span><br><span class="line">SQL&gt;</span><br></pre></td></tr></table></figure></p>
+<a id="more"></a>
+<p>执行@awrrpt.sql<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; @awrrpt.sql</span><br><span class="line"></span><br><span class="line">Current Instance</span><br><span class="line">~~~~~~~~~~~~~~~~</span><br><span class="line"></span><br><span class="line">   DB Id    DB Name	 Inst Num Instance</span><br><span class="line">----------- ------------ -------- ------------</span><br><span class="line"> 3757755618 ADDB		1 addb</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Specify the Report Type</span><br><span class="line">~~~~~~~~~~~~~~~~~~~~~~~</span><br><span class="line">Would you like an HTML report, or a plain text report?</span><br><span class="line">Enter &apos;html&apos; for an HTML report, or &apos;text&apos; for plain text</span><br><span class="line">Defaults to &apos;html&apos;</span><br><span class="line">Enter value for report_type:</span><br></pre></td></tr></table></figure></p>
+<p>选择html类型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">Type Specified: html</span><br><span class="line">Instances in this Workload Repository schema</span><br><span class="line">~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span><br><span class="line"></span><br><span class="line">   DB Id     Inst Num DB Name	   Instance	Host</span><br><span class="line">------------ -------- ------------ ------------ ------------</span><br><span class="line">* 3757755618	    1 ADDB	   addb 	dszy-cs-app-</span><br><span class="line">						ad-check-db1</span><br><span class="line"></span><br><span class="line">Using 3757755618 for database Id</span><br><span class="line">Using	       1 for instance number</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Specify the number of days of snapshots to choose from</span><br><span class="line">~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span><br><span class="line">Entering the number of days (n) will result in the most recent</span><br><span class="line">(n) days of snapshots being listed.  Pressing &lt;return&gt; without</span><br><span class="line">specifying a number lists all completed snapshots.</span><br></pre></td></tr></table></figure>
+<p>导出1天<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">Enter value for num_days: 1</span><br><span class="line"></span><br><span class="line">Listing the last day&apos;s Completed Snapshots</span><br><span class="line"></span><br><span class="line">							Snap</span><br><span class="line">Instance     DB Name	    Snap Id    Snap Started    Level</span><br><span class="line">------------ ------------ --------- ------------------ -----</span><br><span class="line">addb	     ADDB	      13874 12 Dec 2019 00:00	   1</span><br><span class="line">			      13875 12 Dec 2019 01:00	   1</span><br><span class="line">			      13876 12 Dec 2019 02:00	   1</span><br><span class="line">			      13877 12 Dec 2019 03:00	   1</span><br><span class="line">			      13878 12 Dec 2019 04:00	   1</span><br><span class="line">			      13879 12 Dec 2019 05:00	   1</span><br><span class="line">			      13880 12 Dec 2019 06:00	   1</span><br><span class="line">			      13881 12 Dec 2019 07:00	   1</span><br><span class="line">			      13882 12 Dec 2019 08:00	   1</span><br><span class="line">			      13883 12 Dec 2019 09:00	   1</span><br><span class="line">			      13884 12 Dec 2019 10:00	   1</span><br><span class="line">			      13885 12 Dec 2019 11:00	   1</span><br><span class="line">			      13886 12 Dec 2019 12:00	   1</span><br><span class="line">			      13887 12 Dec 2019 13:00	   1</span><br><span class="line">			      13888 12 Dec 2019 14:00	   1</span><br><span class="line">			      13889 12 Dec 2019 15:00	   1</span><br><span class="line">			      13890 12 Dec 2019 16:00	   1</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Specify the Begin and End Snapshot Ids</span><br><span class="line">~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span><br><span class="line">Enter value for begin_snap:</span><br></pre></td></tr></table></figure></p>
+<p>可以看到oracle每小时统计一次<br>根据时间选择开始结束节点。这里选择10：00 - 11：00，即13884 - 13885<br>生成报告到执行文件：/tmp/awr-20191212.html<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span><br><span class="line">Enter value for begin_snap: 13884 </span><br><span class="line">Begin Snapshot Id specified: 13884</span><br><span class="line"></span><br><span class="line">Enter value for end_snap: 13885</span><br><span class="line">End   Snapshot Id specified: 13885</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Specify the Report Name</span><br><span class="line">~~~~~~~~~~~~~~~~~~~~~~~</span><br><span class="line">The default report file name is awrrpt_1_13884_13885.html.  To use this name,</span><br><span class="line">press &lt;return&gt; to continue, otherwise enter an alternative.</span><br><span class="line"></span><br><span class="line">Enter value for report_name: /tmp/awr-20191212.html</span><br></pre></td></tr></table></figure></p>
+<h2 id="分析AWR报告"><a href="#分析AWR报告" class="headerlink" title="分析AWR报告"></a>分析AWR报告</h2><h3 id="DB-Time"><a href="#DB-Time" class="headerlink" title="DB Time"></a>DB Time</h3><p><img src="/images/awr-head.jpg" alt="head"></p>
+<p><strong>Sessions</strong><br>表示采集实例连接的会话数。这个数可以帮助我们了解数据库的并发用户数大概的情况。<br><strong>Cursors/session</strong><br>每个会话平均打开的游标数。<br><strong>Elapsed</strong><br>两个快照的间隔时间<br><strong>DB Time</strong><br>表示用户操作花费的时间，包括CPU时间和等待事件。通常通过这个数值判读数据库的负载情况。<br>一般来说，Elapsed时间乘以CPU个数如果大于DB Time，就是正常的，系统压力不大，反之就说明压力较大</p>
+<blockquote>
+<p><em>上图中Elapsed*cup&lt;DB Time，系统压力较大</em></p>
+</blockquote>
+<h3 id="Load-Profile"><a href="#Load-Profile" class="headerlink" title="Load Profile"></a>Load Profile</h3><p><img src="/images/awr-loadProfile.jpg" alt="loadProfile"><br>load_profile指标主要用来显示当前系统的一些指示性能的总体参数<br><strong>Redo_size</strong><br>用来显示平均每秒的日志尺寸和平均每个事务的日志尺寸，有时候可以结合Transactions这个每秒事务数，分析当前事务的繁忙程度<br><strong>Transactions</strong><br>每秒的事务数。表示一个系统的事务繁忙程度。<br>一般来说Transactions不超过200都是正常的，或者200左右都是正常的，超过1000就是非常繁忙了.</p>
+<p>看看平均每秒的日志尺寸是5位数的，平均每个事务的日志尺寸是4位数的，说明了系统访问比较频繁，而单个业务不复杂，如果反过来，平均每秒日志尺寸比平均每事务日志尺寸小很多，说明系统访问不频繁，而业务比较比较复杂，响应时间很久</p>
+<h3 id="SQL-Statistics"><a href="#SQL-Statistics" class="headerlink" title="SQL Statistics"></a>SQL Statistics</h3><p>SQL Statistics从几个维度列举了系统执行比较慢的SQL，可以点击查看SQL，进行调优</p>
+<blockquote>
+<p>SQL Statistics包含：<br><em>SQL ordered by Elapsed Time<br>SQL ordered by CPU Time<br>SQL ordered by User I/O Wait Time<br>SQL ordered by Gets<br>SQL ordered by Reads<br>SQL ordered by Physical Reads (UnOptimized)<br>SQL ordered by Executions<br>SQL ordered by Parse Calls<br>SQL ordered by Sharable Memory<br>SQL ordered by Version Count<br>Complete List of SQL Text</em></p>
+</blockquote>
+<p><img src="/images/awr-statistics.png" alt="statistics"></p>
+<p>上图是SQL ordered by Elapsed Time和SQL ordered by CPU Time的示例<br>可以看到SQL id为fnxksbrgqbk9c单次执行时间为2.81s,占用cpu0.53s，c4fab3d63qh3m单次执行时间为1.01s,占用cpu0.56s。<br>找到问题sql，下一步就可以对sql进行调优。</p>
+<p>AWR的性能指标还有很多，这里只是简单说明了一些重要指标。<br>感兴趣的同学可以深入学习一下。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/sql/" rel="tag"># sql</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/08/20180408-littleNotes/" rel="next" title="mybatis和spring的一些笔记">
+                <i class="fa fa-chevron-left"></i> mybatis和spring的一些笔记
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/12/12/SQL分析与优化二/" rel="prev" title="SQL分析与优化二">
+                SQL分析与优化二 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          
+            <img class="site-author-image" itemprop="image"
+              src="/images/locky.jpg"
+              alt="liangshenlong" />
+          
+            <p class="site-author-name" itemprop="name">liangshenlong</p>
+            <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+            
+              <a href="/archives/">
+            
+                <span class="site-state-item-count">12</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/liangshenlong" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>GitHub</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#生成Oracle-AWR报告"><span class="nav-number">1.</span> <span class="nav-text">生成Oracle AWR报告</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分析AWR报告"><span class="nav-number">2.</span> <span class="nav-text">分析AWR报告</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#DB-Time"><span class="nav-number">2.1.</span> <span class="nav-text">DB Time</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Load-Profile"><span class="nav-number">2.2.</span> <span class="nav-text">Load Profile</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SQL-Statistics"><span class="nav-number">2.3.</span> <span class="nav-text">SQL Statistics</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">liangshenlong</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+  <span class="post-meta-divider">|</span>
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.2</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://liangshenlong.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://liangshenlong.github.io/2019/12/12/SQL分析与优化一/';
+          this.page.identifier = '2019/12/12/SQL分析与优化一/';
+          this.page.title = 'SQL分析与优化一';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://liangshenlong.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
